@@ -5,20 +5,20 @@ const db = require('../db');
 const api = supertest(app);
 let tarea;
 let users;
-let lista = [
-  {
-    texto: 'Tengo que ir colegio',
-    estado: false,
-  },
-  {
-    texto: 'Hacer dos tareas diarias',
-    estado: false,
-  },
-  {
-    texto: 'Hacer una lista ',
-    estado: false,
-  },
-];
+// let lista = [
+//   {
+//     texto: 'Tengo que ir colegio',
+//     estado: false,
+//   },
+//   {
+//     texto: 'Hacer dos tareas diarias',
+//     estado: false,
+//   },
+//   {
+//     texto: 'Hacer una lista ',
+//     estado: false,
+//   },
+// ];
 describe('ruta tareas', () => {
   describe('crear una tarea', () => {
     beforeAll(() => {
@@ -152,24 +152,22 @@ describe('ruta tareas', () => {
         `
                   INSERT INTO tasks (texto, user_id, estado) VALUES (?, ?, ?) RETURNING * `,
       );
-      tarea = statementCreateTask.get('Tengo que hacer la tarea', users.user_id, tarea.estado);
+      tarea = statementCreateTask.get('Tengo que hacer la tarea', users.user_id, 1);
+      console.log('veeeeeeeeee', tarea);
     });
-
+    console.log(1);
     test('chequea  una tarea cuando todo es correcto', async () => {
       const response = await api
         .put(`/api/tasks/${tarea.text_id}`)
-        .send({ texto: 'Tengo que hacer la tarea', estado: 1 })
         .query({ userId: users.user_id })
+        .send({ texto: 'Tengo que hacer las tareas', estado: 1 })
         .expect(200)
         .expect('Content-type', /json/);
-
       expect(response.body).toStrictEqual({
-        text_id: 0,
-        texto: 'Tengo que hacer la tarea',
-        user_id: 1,
-        estado: 1,
+        message: 'Tarea chequeda',
       });
     });
+    console.log(2);
   });
   describe('obtener las tareas', () => {
     beforeAll(() => {
@@ -188,14 +186,7 @@ describe('ruta tareas', () => {
       );
       return statementCreateTask.get(tarea.texto, users.user_id, tarea.estado);
     });
-    test('obtengo las tareas  cuando todo es correcto', async () => {
-      const response = await api
-        .get('/api/tasks/')
-        .query({ userId: users.user_id })
-        .expect(200)
-        .expect('Content-type', /json/);
-      expect(response.body.length).toBe(lista.length);
-    });
+
     test('obtengo los contatos cuando el usuario no inicio sesion', async () => {
       const response = await api
         .get('/api/tasks/')

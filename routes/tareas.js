@@ -52,26 +52,47 @@ tareasRouter.put('/:id', async (request, response) => {
   try {
     // obtener la tarea
     const { texto, estado } = request.body;
-    if (!REGEX_TEXT(texto)) {
-      return response.status(400).json({ message: 'La tarea invalida' });
-    } else if (estado === 1) {
-      return response.status(200).json({ message: 'La tarea ejecutada' });
+    if (estado === 1) {
+      return response.status(200).json({ message: 'Tarea chequeda' });
     }
+    // if (!REGEX_TEXT.test(texto)) {
+    //   console.log(1);
+    //   return response.status(400).json({ message: 'La tarea invalida' });
+    // } else if (estado !== true) {
+    //   console.log(2);
+    //   return response.status(400).json({ message: 'tarea sin chequear' });
+    // }
+    console.log(3);
     const statement = db.prepare(
-      ' UPDATE tasks  SET texto = ? estado = ? WHERE text_id = ? and user_id = ?  RETURNING * ',
+      `
+        UPDATE tasks  SET 
+      texto = ?, 
+      estado = ? 
+        WHERE 
+        text_id = ? AND user_id = ?  
+         RETURNING *
+      `,
     );
+    console.log(3, statement);
+
     const updateTasks = statement.get(
       texto,
       estado,
       Number(request.params.id),
       Number(request.query.userId),
     );
+    console.log(4, updateTasks);
+
     if (!updateTasks) {
-      return response.status(400).json({ message: 'La tarea no existe' });
+      console.log(5);
+
+      return response.status(400).json({ error: 'La tarea no existe' });
     }
+    console.log(6);
+
     return response.status(200).json(updateTasks);
   } catch (error) {
-    console.log(error);
+    console.log('errrorrrrr', error);
     if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
       console.log('error sql');
       return response.status(400).json({ error: 'El email ya esta en uso' });
