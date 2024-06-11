@@ -192,7 +192,7 @@ describe('ruta tareas', () => {
     console.log('total de tareasssssss', lista.length);
     test('obtener todas las tarea cuando todo es correcto', async () => {
       const response = await api
-        .get('/api/tasks/')
+        .put('/api/tasks/')
         .query({ userId: users.user_id })
         .expect(200)
         .expect('Content-type', /json/);
