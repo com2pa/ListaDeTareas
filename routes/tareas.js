@@ -62,7 +62,7 @@ tareasRouter.put('/:id', async (request, response) => {
     //   console.log(2);
     //   return response.status(400).json({ message: 'tarea sin chequear' });
     // }
-    console.log(3);
+    // console.log(3);
     const statement = db.prepare(
       `
         UPDATE tasks  SET 
@@ -73,7 +73,7 @@ tareasRouter.put('/:id', async (request, response) => {
          RETURNING *
       `,
     );
-    console.log(3, statement);
+    // console.log(3, statement);
 
     const updateTasks = statement.get(
       texto,
@@ -84,11 +84,11 @@ tareasRouter.put('/:id', async (request, response) => {
     console.log(4, updateTasks);
 
     if (!updateTasks) {
-      console.log(5);
+      // console.log(5);
 
       return response.status(400).json({ error: 'La tarea no existe' });
     }
-    console.log(6);
+    // console.log(6);
 
     return response.status(200).json(updateTasks);
   } catch (error) {
@@ -104,7 +104,16 @@ tareasRouter.put('/:id', async (request, response) => {
 //
 tareasRouter.put('/', async (request, response) => {
   try {
-    const statement = db.prepare(' SELECT * FROM tasks WHERE user_id = ? RETURNING * ');
+    // const { estado } = request.body;
+    // if (estado.length) {
+    //   return response.status(200).json({ message: 'Tareas sin chequear' });
+    // }  else if (estado === 1) {
+    //   return response.status(200).json({ message: 'Tareas chequedas' });
+    // } else {
+    //   return response.status(200).json({ message: 'total' });
+    // }
+
+    const statement = db.prepare(' SELECT * FROM tasks WHERE  user_id = ?  ');
     const Tasks = statement.all(Number(request.query.userId));
 
     return response.status(200).json(Tasks);

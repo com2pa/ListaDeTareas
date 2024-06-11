@@ -5,20 +5,20 @@ const db = require('../db');
 const api = supertest(app);
 let tarea;
 let users;
-// let lista = [
-//   {
-//     texto: 'Tengo que ir colegio',
-//     estado: false,
-//   },
-//   {
-//     texto: 'Hacer dos tareas diarias',
-//     estado: false,
-//   },
-//   {
-//     texto: 'Hacer una lista ',
-//     estado: false,
-//   },
-// ];
+let lista = [
+  {
+    texto: 'Tengo que ir colegio',
+    estado: 1,
+  },
+  {
+    texto: 'Hacer dos tareas diarias',
+    estado: 1,
+  },
+  {
+    texto: 'Hacer una lista ',
+    estado: 1,
+  },
+];
 describe('ruta tareas', () => {
   describe('crear una tarea', () => {
     beforeAll(() => {
@@ -180,13 +180,24 @@ describe('ruta tareas', () => {
       users = statementCreateUser.get('com2pavegas@gmail.com');
       const statementDeleteTasks = db.prepare('DELETE FROM tasks');
       statementDeleteTasks.run();
-      const statementCreateTask = db.prepare(
-        `
-                  INSERT INTO tasks (texto, user_id, estado) VALUES (?,?, ?) RETURNING * `,
-      );
-      return statementCreateTask.get(tarea.texto, users.user_id, tarea.estado);
-    });
 
+      lista = lista.map((list) => {
+        const statementCreateTask = db.prepare(
+          `
+                      INSERT INTO tasks (texto, estado, user_id) VALUES (?, ?, ?) RETURNING * `,
+        );
+        return statementCreateTask.get(list.texto, list.estado, users.user_id);
+      });
+    });
+    console.log('total de tareasssssss', lista.length);
+    test('obtener todas las tarea cuando todo es correcto', async () => {
+      const response = await api
+        .get('/api/tasks/')
+        .query({ userId: users.user_id })
+        .expect(200)
+        .expect('Content-type', /json/);
+      expect(response.body.length).toBe(lista.length);
+    });
     test('obtengo los contatos cuando el usuario no inicio sesion', async () => {
       const response = await api
         .get('/api/tasks/')
