@@ -160,7 +160,7 @@ describe('ruta tareas', () => {
       const response = await api
         .put(`/api/tasks/${tarea.text_id}`)
         .query({ userId: users.user_id })
-        .send({ texto: 'Tengo que hacer las tareas', estado: 1 })
+        .send({ estado: 1 })
         .expect(200)
         .expect('Content-type', /json/);
       expect(response.body).toStrictEqual({

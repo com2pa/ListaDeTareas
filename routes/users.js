@@ -35,4 +35,20 @@ usersRouter.post('/', async (request, response) => {
 });
 
 //
+
+usersRouter.get('/', async (request, response) => {
+  try {
+    const userEmail = request.query.userEmail;
+    const user = db.prepare('SELECT * FROM users WHERE email = ? ').get(userEmail);
+    return response.status(200).json(user);
+  } catch (error) {
+    //comprando que el email ya existe
+    console.log(error);
+    if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      return response.status(400).json({ error: 'el email ya existe ' });
+    }
+    //en caso que te suceda otro error que no se conoce colocar esto
+    return response.sendStatus(400);
+  }
+});
 module.exports = usersRouter;

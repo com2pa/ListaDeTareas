@@ -51,23 +51,12 @@ tareasRouter.delete('/:id', async (request, response) => {
 tareasRouter.put('/:id', async (request, response) => {
   try {
     // obtener la tarea
-    const { texto, estado } = request.body;
-    if (estado === 1) {
-      return response.status(200).json({ message: 'Tarea chequeda' });
-    }
-    // if (!REGEX_TEXT.test(texto)) {
-    //   console.log(1);
-    //   return response.status(400).json({ message: 'La tarea invalida' });
-    // } else if (estado !== true) {
-    //   console.log(2);
-    //   return response.status(400).json({ message: 'tarea sin chequear' });
-    // }
-    // console.log(3);
+    const { estado } = request.body;
+
     const statement = db.prepare(
       `
         UPDATE tasks  SET 
-      texto = ?, 
-      estado = ? 
+          estado = ? 
         WHERE 
         text_id = ? AND user_id = ?  
          RETURNING *
@@ -76,7 +65,6 @@ tareasRouter.put('/:id', async (request, response) => {
     // console.log(3, statement);
 
     const updateTasks = statement.get(
-      texto,
       estado,
       Number(request.params.id),
       Number(request.query.userId),
@@ -101,18 +89,9 @@ tareasRouter.put('/:id', async (request, response) => {
   }
 });
 
-//
+//obtener todas las tareas
 tareasRouter.put('/', async (request, response) => {
   try {
-    // const { estado } = request.body;
-    // if (estado.length) {
-    //   return response.status(200).json({ message: 'Tareas sin chequear' });
-    // }  else if (estado === 1) {
-    //   return response.status(200).json({ message: 'Tareas chequedas' });
-    // } else {
-    //   return response.status(200).json({ message: 'total' });
-    // }
-
     const statement = db.prepare(' SELECT * FROM tasks WHERE  user_id = ?  ');
     const Tasks = statement.all(Number(request.query.userId));
 
